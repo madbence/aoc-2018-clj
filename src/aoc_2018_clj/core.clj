@@ -2,6 +2,8 @@
   (:require [clojure.string :as str])
   (:gen-class))
 
+(def lines (str/split (slurp *in*) #"\n"))
+
 (defn ->int [c]
   (cond
     (string? c) (Integer/parseInt c)
@@ -9,25 +11,15 @@
     :else (- (int c) 48)))
 
 (defn p01a []
-  (loop [freq 0]
-    (if-let [n (->int (read-line))]
-      (recur (+ freq n))
-      freq)))
+  (reduce + 0 (map ->int lines)))
 
 (defn p01b []
-  (let [adjustments (loop [xs []]
-                      (if-let [x (->int (read-line))]
-                        (recur (conj xs x))
-                        xs))]
-    (loop [freq 0
-           history #{}
-           adj (cycle adjustments)]
-      (let [next-freq (+ freq (first adj))]
-        (if (contains? history next-freq)
-          next-freq
-          (recur next-freq
-                 (conj history freq)
-                 (next adj)))))))
+  (loop [history #{}
+         freqs (reductions + (cycle (map ->int lines)))]
+    (let [freq (first freqs)]
+      (if (contains? history freq)
+        freq
+        (recur (conj history freq) (next freqs))))))
 
 (defn -main
   "Advent of Code 2018"
