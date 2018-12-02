@@ -20,21 +20,20 @@
         (recur (conj history freq) (next freqs))))))
 
 (defn p02a [lines]
-  (let [letter-freqs (map (fn [line]
-                            (reduce (fn [num-found c]
-                                      (conj num-found (count (filter #(= %1 c) line))))
-                                    #{} line)) lines)
-        [twos threes] (reduce (fn [[twos threes] freqs]
-                                [(+ twos (if (contains? freqs 2) 1 0))
-                                 (+ threes (if (contains? freqs 3) 1 0))])
-                              [0 0] letter-freqs)]
-    (* twos threes)))
+  (let [has-freq? (fn [n word] (some #(= % n) (vals (frequencies word))))]
+    (* (count (filter (partial has-freq? 2) lines))
+       (count (filter (partial has-freq? 3) lines)))))
 
 (defn p02b [lines]
-  (let [matching-chars (fn [[a b]] (filter (fn [[a b]] (= a b)) (map vector a b)))
-        differs-by-one? (fn [[a b]] (= (count (filter (fn [[a b]] (not= a b)) (map vector a b))) 1))
-        pairs (mapcat (fn [line] (filter differs-by-one? (map (partial vector line) lines))) lines)]
-    (str/join (map #(first %1) (matching-chars (first pairs))))))
+  (->> (for [a lines b lines] [a b])
+       (map (partial apply map vector))
+       (filter #(-> (filter (partial apply not=) %)
+                    (count)
+                    (= 1)))
+       (first)
+       (filter (partial apply =))
+       (map first)
+       (str/join)))
 
 (defn -main
   "Advent of Code 2018"
