@@ -26,12 +26,12 @@
 
 (defn p02b [lines]
   (->> (for [a lines b lines] [a b])
-       (map (partial apply map vector))
+       (map #(apply map vector %))
        (filter #(-> (filter (partial apply not=) %)
                     (count)
                     (= 1)))
        (first)
-       (filter (partial apply =))
+       (filter #(apply = %))
        (map first)
        (str/join)))
 
