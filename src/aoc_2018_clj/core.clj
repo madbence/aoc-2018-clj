@@ -2,18 +2,16 @@
   (:require [clojure.string :as str])
   (:gen-class))
 
-(def lines (str/split (slurp *in*) #"\n"))
-
 (defn ->int [c]
   (cond
     (string? c) (Integer/parseInt c)
     (nil? c) nil
     :else (- (int c) 48)))
 
-(defn p01a []
+(defn p01a [lines]
   (reduce + 0 (map ->int lines)))
 
-(defn p01b []
+(defn p01b [lines]
   (loop [history #{}
          freqs (reductions + (cycle (map ->int lines)))]
     (let [freq (first freqs)]
@@ -24,4 +22,4 @@
 (defn -main
   "Advent of Code 2018"
   [& args]
-  (println ((resolve (symbol "aoc-2018-clj.core" (first args))))))
+  (println ((resolve (symbol "aoc-2018-clj.core" (first args))) (str/split (slurp *in*) #"\n"))))
